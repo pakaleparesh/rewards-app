@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-export const Controls = ({ periods, selectedPeriod, onPeriodChange, searchTerm, onSearchChange }) => (
+export const Controls = ({ periods, selectedPeriod, onPeriodChange }) => (
   <section className="controls-panel">
     <div className="controls-row">
       <label className="controls-label">
@@ -18,17 +18,6 @@ export const Controls = ({ periods, selectedPeriod, onPeriodChange, searchTerm, 
           ))}
         </select>
       </label>
-
-      <label className="controls-label">
-        Search customer
-        <input
-          className="controls-input"
-          type="search"
-          value={searchTerm}
-          placeholder="Search by name"
-          onChange={(event) => onSearchChange(event.target.value)}
-        />
-      </label>
     </div>
   </section>
 )
@@ -44,6 +33,4 @@ Controls.propTypes = {
   ).isRequired,
   selectedPeriod: PropTypes.string.isRequired,
   onPeriodChange: PropTypes.func.isRequired,
-  searchTerm: PropTypes.string.isRequired,
-  onSearchChange: PropTypes.func.isRequired,
 }

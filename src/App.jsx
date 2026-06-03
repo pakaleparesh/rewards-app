@@ -12,7 +12,6 @@ function App() {
   const [rewards, setRewards] = useState(null)
   const [customers, setCustomers] = useState([])
   const [selectedPeriod, setSelectedPeriod] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -42,26 +41,12 @@ function App() {
     [periods],
   )
 
-  const filteredRewards = useMemo(() => {
-    if (!rewards || !searchTerm) return rewards
-    const normalizedSearch = searchTerm.toLowerCase()
-    return Object.entries(rewards).reduce((acc, [id, data]) => {
-      if (data.name.toLowerCase().includes(normalizedSearch)) {
-        acc[id] = data
-      }
-      return acc
-    }, {})
-  }, [rewards, searchTerm])
-
   const filteredTransactions = useMemo(() => {
     if (!transactions) return []
-    const normalizedSearch = searchTerm.toLowerCase()
     return transactions.filter((transaction) => {
-      const matchesPeriod = selectedPeriod === 'all' || `${transaction.year}-${transaction.month}` === selectedPeriod
-      const matchesSearch = !searchTerm || transaction.customerName.toLowerCase().includes(normalizedSearch)
-      return matchesPeriod && matchesSearch
+      return selectedPeriod === 'all' || `${transaction.year}-${transaction.month}` === selectedPeriod
     })
-  }, [transactions, selectedPeriod, searchTerm])
+  }, [transactions, selectedPeriod])
 
   const selectedPeriods = useMemo(() => {
     if (selectedPeriod === 'all') {
@@ -91,12 +76,10 @@ function App() {
               periods={periodOptions}
               selectedPeriod={selectedPeriod}
               onPeriodChange={setSelectedPeriod}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
             />
 
-            <MonthlyRewardsTable rewards={filteredRewards || rewards} periods={selectedPeriods} />
-            <TotalRewardsTable rewards={filteredRewards || rewards} />
+            <MonthlyRewardsTable rewards={rewards} periods={selectedPeriods} />
+            <TotalRewardsTable rewards={rewards} />
             <TransactionsTable transactions={filteredTransactions} />
           </>
         )}
