@@ -1,11 +1,37 @@
+import { useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 export const TotalRewardsTable = ({ rewards }) => {
-  const rows = Object.values(rewards).sort((first, second) => second.total - first.total)
+  const [sortConfig, setSortConfig] = useState({ key: 'total', direction: 'desc' })
+  const rows = Object.values(rewards)
 
-  if (!rows.length) {
+  const sortedRows = useMemo(() => {
+    const direction = sortConfig.direction === 'asc' ? 1 : -1
+    return [...rows].sort((first, second) => {
+      if (sortConfig.key === 'customerName') {
+        return first.name.localeCompare(second.name) * direction
+      }
+      return (first.total - second.total) * direction
+    })
+  }, [rows, sortConfig])
+
+  const handleSort = (key) => {
+    setSortConfig((current) => {
+      if (current.key === key) {
+        return {
+          key,
+          direction: current.direction === 'asc' ? 'desc' : 'asc',
+        }
+      }
+      return { key, direction: 'asc' }
+    })
+  }
+
+  if (!sortedRows.length) {
     return <div className="table-empty">No reward summary is available.</div>
   }
+
+  const sortIndicator = (key) => (sortConfig.key === key ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : '')
 
   return (
     <section className="data-section">
@@ -16,12 +42,16 @@ export const TotalRewardsTable = ({ rewards }) => {
       <table className="data-table">
         <thead>
           <tr>
-            <th>Customer Name</th>
-            <th>Total Reward Points</th>
+            <th className="sortable" onClick={() => handleSort('customerName')}>
+              Customer Name{sortIndicator('customerName')}
+            </th>
+            <th className="sortable" onClick={() => handleSort('total')}>
+              Total Reward Points{sortIndicator('total')}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
+          {sortedRows.map((row) => (
             <tr key={row.id}>
               <td>{row.name}</td>
               <td>{row.total}</td>

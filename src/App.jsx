@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { fetchCustomerRewards, getAllTransactions } from './services/api'
-import { getUniquePeriods } from './utils/rewardsCalculator'
+import {
+  getMonthIndex,
+  getMonthKey,
+  getUniquePeriods,
+  processAllCustomers,
+} from './utils/rewardsCalculator'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { MonthlyRewardsTable } from './components/MonthlyRewardsTable'
 import { TotalRewardsTable } from './components/TotalRewardsTable'
@@ -12,6 +17,9 @@ function App() {
   const [rewards, setRewards] = useState(null)
   const [customers, setCustomers] = useState([])
   const [selectedPeriod, setSelectedPeriod] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [rangeStart, setRangeStart] = useState('')
+  const [rangeEnd, setRangeEnd] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -34,27 +42,59 @@ function App() {
   }, [])
 
   const periods = useMemo(() => getUniquePeriods(customers), [customers])
-  const transactions = useMemo(() => getAllTransactions(customers), [customers])
 
   const periodOptions = useMemo(
     () => periods.map((period) => ({ label: period.label, value: period.key, key: period.key })),
     [periods],
   )
 
-  const filteredTransactions = useMemo(() => {
-    if (!transactions) return []
-    return transactions.filter((transaction) => {
-      return selectedPeriod === 'all' || `${transaction.year}-${transaction.month}` === selectedPeriod
-    })
-  }, [transactions, selectedPeriod])
+  const normalizedSearch = searchTerm.trim().toLowerCase()
 
-  const selectedPeriods = useMemo(() => {
-    if (selectedPeriod === 'all') {
-      return periods
-    }
+  const filteredCustomers = useMemo(() => {
+    const startDate = rangeStart ? new Date(rangeStart) : null
+    const endDate = rangeEnd ? new Date(rangeEnd) : null
 
-    return periods.filter((period) => period.key === selectedPeriod)
-  }, [periods, selectedPeriod])
+    return customers
+      .map((customer) => {
+        const customerSearchMatch = normalizedSearch && customer.name.toLowerCase().includes(normalizedSearch)
+
+        const filteredTransactions = customer.transactions
+          .map((transaction) => ({
+            ...transaction,
+            dateObject: new Date(transaction.year, getMonthIndex(transaction.month), transaction.date),
+          }))
+          .filter((transaction) => {
+            if (selectedPeriod !== 'all' && getMonthKey(transaction.year, transaction.month) !== selectedPeriod) {
+              return false
+            }
+
+            if (startDate && transaction.dateObject < startDate) {
+              return false
+            }
+
+            if (endDate && transaction.dateObject > endDate) {
+              return false
+            }
+
+            if (!normalizedSearch) {
+              return true
+            }
+
+            return (
+              customerSearchMatch ||
+              transaction.id.toLowerCase().includes(normalizedSearch) ||
+              transaction.product.toLowerCase().includes(normalizedSearch)
+            )
+          })
+
+        return { ...customer, transactions: filteredTransactions }
+      })
+      .filter((customer) => customer.transactions.length > 0)
+  }, [customers, selectedPeriod, normalizedSearch, rangeStart, rangeEnd])
+
+  const filteredRewards = useMemo(() => processAllCustomers(filteredCustomers), [filteredCustomers])
+  const filteredPeriods = useMemo(() => getUniquePeriods(filteredCustomers), [filteredCustomers])
+  const filteredTransactions = useMemo(() => getAllTransactions(filteredCustomers), [filteredCustomers])
 
   return (
     <div className="app-container">
@@ -76,18 +116,21 @@ function App() {
               periods={periodOptions}
               selectedPeriod={selectedPeriod}
               onPeriodChange={setSelectedPeriod}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              rangeStart={rangeStart}
+              rangeEnd={rangeEnd}
+              onRangeStartChange={setRangeStart}
+              onRangeEndChange={setRangeEnd}
             />
 
-            <MonthlyRewardsTable rewards={rewards} periods={selectedPeriods} />
-            <TotalRewardsTable rewards={rewards} />
+            <MonthlyRewardsTable rewards={filteredRewards} periods={filteredPeriods} />
+            <TotalRewardsTable rewards={filteredRewards} />
             <TransactionsTable transactions={filteredTransactions} />
           </>
         )}
       </main>
 
-      <footer className="app-footer">
-        <p>&copy; 2024 Customer Rewards Program</p>
-      </footer>
     </div>
   )
 }

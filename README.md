@@ -12,6 +12,11 @@ This solution uses React JS without TypeScript or Redux.
 
 The app processes mock transactions for customers across three consecutive months, including December 2023, January 2024, and February 2024. It aggregates reward points by customer, month, and total, while handling decimals and year boundaries.
 
+## Test Case Example
+
+![Test case example](public/test-case-image.svg)
+
+
 ## Reward Points Rules
 
 Points are awarded per transaction as follows:
@@ -110,7 +115,7 @@ npm test
 
 - The mock dataset includes transactions across December 2023, January 2024, and February 2024.
 - Reward points are computed correctly for decimal amounts.
-- The UI supports search and period filters without state-based sort logic.
+- The UI supports search, date range, period filters, and sortable tables.
 
 - **ESLint 10.3**: Code linting
 - **Jest 29.7**: Testing framework
@@ -156,5 +161,4 @@ This project is provided as-is for educational and assessment purposes.
 
 ---
 
-**Created**: June 2024  
 **Last Updated**: June 2024
