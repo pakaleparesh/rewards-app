@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420">
+  <rect width="800" height="420" rx="24" fill="#f5f7fa"/>
+  <rect x="40" y="40" width="720" height="120" rx="18" fill="#667eea" opacity="0.95"/>
+  <text x="60" y="90" fill="#fff" font-family="Arial, sans-serif" font-size="28" font-weight="700">Test Case Example</text>
+  <text x="60" y="130" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="18">Search, date range, and filter behavior</text>
+  <rect x="40" y="180" width="220" height="28" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="55" y="200" fill="#4a5568" font-family="Arial, sans-serif" font-size="14">Search by name or product</text>
+  <rect x="290" y="180" width="160" height="28" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="305" y="200" fill="#4a5568" font-family="Arial, sans-serif" font-size="14">Start date</text>
+  <rect x="470" y="180" width="160" height="28" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="485" y="200" fill="#4a5568" font-family="Arial, sans-serif" font-size="14">End date</text>
+  <rect x="40" y="240" width="720" height="28" rx="8" fill="#fff" stroke="#cbd5e1"/>
+  <text x="55" y="260" fill="#4a5568" font-family="Arial, sans-serif" font-size="14">Transactions table with sortable headers</text>
+  <g fill="#edf2ff" stroke="#cbd5e1" stroke-width="1">
+    <rect x="40" y="280" width="140" height="28" rx="6"/>
+    <rect x="190" y="280" width="120" height="28" rx="6"/>
+    <rect x="320" y="280" width="120" height="28" rx="6"/>
+    <rect x="450" y="280" width="120" height="28" rx="6"/>
+    <rect x="580" y="280" width="120" height="28" rx="6"/>
+  </g>
+  <text x="56" y="300" fill="#2d3748" font-family="Arial, sans-serif" font-size="13">TXN001</text>
+  <text x="206" y="300" fill="#2d3748" font-family="Arial, sans-serif" font-size="13">Alice Johnson</text>
+  <text x="338" y="300" fill="#2d3748" font-family="Arial, sans-serif" font-size="13">Dec 15, 2023</text>
+  <text x="465" y="300" fill="#2d3748" font-family="Arial, sans-serif" font-size="13">Laptop</text>
+  <text x="595" y="300" fill="#2d3748" font-family="Arial, sans-serif" font-size="13">$1250.50</text>
+</svg>
