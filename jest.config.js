@@ -8,8 +8,8 @@ export default {
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   collectCoverageFrom: [
-    'src/**/*.{js,jsx}',
-    '!src/main.jsx',
+    'src/**/*.js',
+    '!src/main.js',
     '!src/index.css',
   ],
 };

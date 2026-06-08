@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { getMonthIndex, getMonthKey } from '../utils/rewardsCalculator'
 
@@ -12,7 +12,7 @@ export const MonthlyRewardsTable = ({ rewards, periods }) => {
         customerId: customer.id,
         customerName: customer.name,
         ...monthly,
-        periodKey: getMonthKey(monthly.year, monthly.month),
+        periodKey: getMonthKey(monthly.year, monthly.monthIndex),
       })),
     )
     .filter((entry) => selectedKeys.has(entry.periodKey))

@@ -13,18 +13,31 @@ const MONTH_NAMES = [
   'December',
 ]
 
+const parseDate = (value) => {
+  if (!value) return null
+  if (value instanceof Date) {
+    return isNaN(value) ? null : value
+  }
+  const d = new Date(value)
+  return isNaN(d) ? null : d
+}
+
 export const getMonthIndex = (monthName) => MONTH_NAMES.findIndex((month) => month === monthName)
 
-export const getMonthKey = (year, month) => {
-  const monthIndex = getMonthIndex(month)
-  const monthNumber = monthIndex >= 0 ? String(monthIndex + 1).padStart(2, '0') : '00'
+export const getMonthKey = (year, monthIndex) => {
+  const monthNumber = typeof monthIndex === 'number' && monthIndex >= 1 && monthIndex <= 12 ? String(monthIndex).padStart(2, '0') : '00'
   return `${year}-${monthNumber}`
 }
 
-export const formatMonthYear = (year, month) => `${month} ${year}`
+export const formatMonthYear = (dateObj) => `${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getFullYear()}`
 
 export const calculateTransactionPoints = (amount) => {
-  const normalizedAmount = Number(amount) || 0
+  const normalizedAmount = Number(amount)
+
+  if (!isFinite(normalizedAmount) || isNaN(normalizedAmount) || normalizedAmount <= 0) {
+    return 0
+  }
+
   if (normalizedAmount <= 50) {
     return 0
   }
@@ -38,8 +51,7 @@ export const sortPeriodEntries = (first, second) => {
   if (first.year !== second.year) {
     return first.year - second.year
   }
-
-  return getMonthIndex(first.month) - getMonthIndex(second.month)
+  return first.monthIndex - second.monthIndex
 }
 
 export const getUniquePeriods = (customers) => {
@@ -47,13 +59,19 @@ export const getUniquePeriods = (customers) => {
 
   customers.forEach((customer) => {
     customer.transactions.forEach((transaction) => {
-      const key = getMonthKey(transaction.year, transaction.month)
+      const dateObj = parseDate(transaction.date)
+      if (!dateObj) return
+
+      const year = dateObj.getFullYear()
+      const monthIndex = dateObj.getMonth() + 1
+      const key = getMonthKey(year, monthIndex)
 
       if (!periodMap.has(key)) {
         periodMap.set(key, {
-          year: transaction.year,
-          month: transaction.month,
-          label: formatMonthYear(transaction.year, transaction.month),
+          year,
+          month: MONTH_NAMES[monthIndex - 1],
+          monthIndex,
+          label: formatMonthYear(dateObj),
           key,
         })
       }
@@ -67,20 +85,35 @@ export const processAllCustomers = (customers) => {
   return customers.reduce((acc, customer) => {
     const monthlyPoints = new Map()
     const totalPoints = customer.transactions.reduce((sum, transaction) => {
-      const points = calculateTransactionPoints(transaction.amount)
-      const entryKey = getMonthKey(transaction.year, transaction.month)
-      const existingEntry = monthlyPoints.get(entryKey) || {
-        year: transaction.year,
-        month: transaction.month,
-        points: 0,
+      try {
+        const amount = Number(transaction.amount)
+        if (!isFinite(amount) || isNaN(amount) || amount <= 0) return sum
+
+        const dateObj = parseDate(transaction.date)
+        if (!dateObj) return sum
+
+        const year = dateObj.getFullYear()
+        const monthIndex = dateObj.getMonth() + 1
+        const entryKey = getMonthKey(year, monthIndex)
+
+        const points = calculateTransactionPoints(amount)
+
+        const existingEntry = monthlyPoints.get(entryKey) || {
+          year,
+          month: MONTH_NAMES[monthIndex - 1],
+          monthIndex,
+          points: 0,
+        }
+
+        monthlyPoints.set(entryKey, {
+          ...existingEntry,
+          points: existingEntry.points + points,
+        })
+
+        return sum + points
+      } catch (e) {
+        return sum
       }
-
-      monthlyPoints.set(entryKey, {
-        ...existingEntry,
-        points: existingEntry.points + points,
-      })
-
-      return sum + points
     }, 0)
 
     acc[customer.id] = {
@@ -97,13 +130,35 @@ export const processAllCustomers = (customers) => {
 export const getAllTransactions = (customers) => {
   return customers
     .flatMap((customer) =>
-      customer.transactions.map((transaction) => ({
-        ...transaction,
-        customerId: customer.id,
-        customerName: customer.name,
-        points: calculateTransactionPoints(transaction.amount),
-        dateObject: new Date(transaction.year, getMonthIndex(transaction.month), transaction.date),
-      })),
+      customer.transactions
+        .map((transaction) => {
+          try {
+            const dateObject = parseDate(transaction.date)
+            const amount = Number(transaction.amount)
+            const points = calculateTransactionPoints(amount)
+
+            return {
+              ...transaction,
+              customerId: customer.id,
+              customerName: customer.name,
+              points,
+              dateObject,
+            }
+          } catch (e) {
+            return {
+              ...transaction,
+              customerId: customer.id,
+              customerName: customer.name,
+              points: 0,
+              dateObject: null,
+            }
+          }
+        })
+        .filter(Boolean),
     )
-    .sort((left, right) => left.dateObject - right.dateObject)
+    .sort((left, right) => {
+      const l = left.dateObject ? left.dateObject.valueOf() : 0
+      const r = right.dateObject ? right.dateObject.valueOf() : 0
+      return l - r
+    })
 }

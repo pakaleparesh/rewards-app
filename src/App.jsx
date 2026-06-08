@@ -1,16 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { fetchCustomerRewards, getAllTransactions } from './services/api'
-import {
-  getMonthIndex,
-  getMonthKey,
-  getUniquePeriods,
-  processAllCustomers,
-} from './utils/rewardsCalculator'
-import { LoadingSpinner } from './components/LoadingSpinner'
-import { MonthlyRewardsTable } from './components/MonthlyRewardsTable'
-import { TotalRewardsTable } from './components/TotalRewardsTable'
-import { TransactionsTable } from './components/TransactionsTable'
-import { Controls } from './components/Controls'
+import { getMonthIndex, getMonthKey, getUniquePeriods, processAllCustomers } from './utils/rewardsCalculator'
+import { LoadingSpinner } from './components/LoadingSpinner.jsx'
+import { MonthlyRewardsTable } from './components/MonthlyRewardsTable.jsx'
+import { TotalRewardsTable } from './components/TotalRewardsTable.jsx'
+import { TransactionsTable } from './components/TransactionsTable.jsx'
+import { Controls } from './components/Controls.jsx'
 import './App.css'
 
 function App() {
@@ -28,11 +23,18 @@ function App() {
       try {
         setLoading(true)
         setError('')
-        const { data, customers: customerData } = await fetchCustomerRewards()
-        setRewards(data)
-        setCustomers(customerData)
-      } catch {
-        setError('Failed to load rewards data. Please try again later.')
+        const response = await fetchCustomerRewards()
+        if (!response || response.success === false) {
+          setRewards({})
+          setCustomers(response?.customers || [])
+          setError(response?.error || 'Failed to load rewards data. Please try again later.')
+          return
+        }
+
+        setRewards(response.data)
+        setCustomers(response.customers)
+      } catch (e) {
+        setError(e?.message || 'Failed to load rewards data. Please try again later.')
       } finally {
         setLoading(false)
       }
@@ -61,18 +63,22 @@ function App() {
         const filteredTransactions = customer.transactions
           .map((transaction) => ({
             ...transaction,
-            dateObject: new Date(transaction.year, getMonthIndex(transaction.month), transaction.date),
+            dateObject: transaction.date ? new Date(transaction.date) : null,
           }))
           .filter((transaction) => {
-            if (selectedPeriod !== 'all' && getMonthKey(transaction.year, transaction.month) !== selectedPeriod) {
+            const periodKey = transaction.dateObject
+              ? getMonthKey(transaction.dateObject.getFullYear(), transaction.dateObject.getMonth() + 1)
+              : null
+
+            if (selectedPeriod !== 'all' && periodKey !== selectedPeriod) {
               return false
             }
 
-            if (startDate && transaction.dateObject < startDate) {
+            if (startDate && transaction.dateObject && transaction.dateObject < startDate) {
               return false
             }
 
-            if (endDate && transaction.dateObject > endDate) {
+            if (endDate && transaction.dateObject && transaction.dateObject > endDate) {
               return false
             }
 
@@ -136,4 +142,3 @@ function App() {
 }
 
 export default App
-

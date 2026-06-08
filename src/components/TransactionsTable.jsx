@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -87,7 +87,7 @@ export const TransactionsTable = ({ transactions }) => {
                       day: '2-digit',
                       year: 'numeric',
                     })
-                  : `${transaction.month} ${transaction.date}, ${transaction.year}`}
+                  : transaction.date}
               </td>
               <td>{transaction.product}</td>
               <td>{currencyFormatter.format(transaction.amount)}</td>
@@ -109,9 +109,7 @@ TransactionsTable.propTypes = {
       amount: PropTypes.number,
       points: PropTypes.number,
       dateObject: PropTypes.instanceOf(Date),
-      month: PropTypes.string,
-      year: PropTypes.number,
-      date: PropTypes.number,
+      date: PropTypes.string,
     }),
   ).isRequired,
 }

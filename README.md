@@ -37,15 +37,15 @@ Points are awarded per transaction as follows:
 react-rewards-app/
 ├── src/
 │   ├── components/
-│   │   ├── LoadingSpinner.jsx          # Loading state component
+│   │   ├── LoadingSpinner.js          # Loading state component
 │   │   ├── LoadingSpinner.css          # Loading spinner styles
-│   │   ├── MonthlyRewardsTable.jsx     # Monthly rewards display table
+│   │   ├── MonthlyRewardsTable.js     # Monthly rewards display table
 │   │   ├── MonthlyRewardsTable.css     # Monthly table styles
-│   │   ├── TotalRewardsTable.jsx       # Total rewards summary table
+│   │   ├── TotalRewardsTable.js       # Total rewards summary table
 │   │   ├── TotalRewardsTable.css       # Total rewards styles
-│   │   ├── TransactionsTable.jsx       # Transaction details table
+│   │   ├── TransactionsTable.js       # Transaction details table
 │   │   ├── TransactionsTable.css       # Transaction table styles
-│   │   ├── ErrorBoundary.jsx           # Error boundary component
+│   │   ├── ErrorBoundary.js           # Error boundary component
 │   │   └── ErrorBoundary.css           # Error boundary styles
 │   ├── data/
 │   │   └── mockData.js                 # Mock customer transaction data
@@ -55,9 +55,9 @@ react-rewards-app/
 │   ├── utils/
 │   │   ├── rewardsCalculator.js        # Pure calculation functions
 │   │   └── rewardsCalculator.test.js   # Calculator unit tests
-│   ├── App.jsx                          # Main application component
+│   ├── App.js                          # Main application component
 │   ├── App.css                          # Application styles
-│   ├── main.jsx                         # React entry point
+│   ├── main.js                         # React entry point
 │   └── index.css                        # Global styles
 ├── public/
 │   └── vite.svg                        # Vite logo
@@ -83,8 +83,8 @@ All calculation logic is implemented as pure functions that:
 - Sorting is performed at render time, not stored in component state
 
 ### 3. Component Design
-- `App.jsx` manages data loading and state
-- `Controls.jsx` provides filtering by period and name
+- `App.js` manages data loading and state
+- `Controls.js` provides filtering by period and name
 - Table components render data with PropTypes validation
 
 ### 4. Async Handling
@@ -162,3 +162,9 @@ This project is provided as-is for educational and assessment purposes.
 ---
 
 **Last Updated**: June 2024
+
+## Screenshots
+
+- **Error state (friendly message):** [public/screenshots/error-1.svg](public/screenshots/error-1.svg)
+- **Error fallback (partial results):** [public/screenshots/error-2.svg](public/screenshots/error-2.svg)
+- **Actual output sample:** [public/screenshots/output.png](public/screenshots/output.png)
