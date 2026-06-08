@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <rect width="100%" height="100%" fill="#fffaf0"/>
+  <text x="60" y="100" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#a85a00">Unexpected error</text>
+  <text x="60" y="140" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#333">Fallback UI is shown with limited data to keep the app usable.</text>
+  <g transform="translate(60,180)">
+    <rect width="220" height="110" rx="8" fill="#fff" stroke="#ddd"/>
+    <text x="16" y="40" font-family="Arial" font-size="14" fill="#333">• Partial results available</text>
+    <text x="16" y="70" font-family="Arial" font-size="14" fill="#333">• Retry will attempt to fetch again</text>
+  </g>
+</svg>
